@@ -1,9 +1,12 @@
 package de.gnmyt.autoresponder;
 
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import de.gnmyt.autoresponder.authentication.AuthenticationDetails;
+import de.gnmyt.autoresponder.authentication.ResponderAuthentication;
 import de.gnmyt.autoresponder.event.api.EventManager;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
+import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,6 +31,20 @@ public class SimpleAutoResponder {
         } catch (IOException e) {
             throw new ResponderException("Could not open a webserver under the port " + port + ": " + e.getMessage());
         }
+
+        registerContext();
+
+        httpServer.start();
+    }
+
+    /**
+     * Registers the responder context
+     */
+    public void registerContext() {
+        HttpContext context = httpServer.createContext("/", new ResponderContext(this));
+
+        if (authenticationDetails != null)
+            context.setAuthenticator(new ResponderAuthentication(authenticationDetails));
     }
 
     /**
