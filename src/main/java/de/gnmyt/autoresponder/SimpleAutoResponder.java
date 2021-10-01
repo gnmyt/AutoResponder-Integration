@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpServer;
 import de.gnmyt.autoresponder.authentication.AuthenticationDetails;
 import de.gnmyt.autoresponder.authentication.ResponderAuthentication;
 import de.gnmyt.autoresponder.event.api.EventManager;
+import de.gnmyt.autoresponder.event.api.Listener;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
 import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 
@@ -45,6 +46,16 @@ public class SimpleAutoResponder {
 
         if (authenticationDetails != null)
             context.setAuthenticator(new ResponderAuthentication(authenticationDetails));
+    }
+
+    /**
+     * Registers the provided listeners
+     *
+     * @param listeners The listeners that you want to register
+     */
+    public void registerListener(Listener... listeners) {
+        for (Listener listener : listeners)
+            eventManager.addEventListener(listener);
     }
 
     /**
