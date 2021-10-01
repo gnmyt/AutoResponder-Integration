@@ -1,5 +1,8 @@
 package de.gnmyt.autoresponder.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.event.api.EventData;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
@@ -11,6 +14,8 @@ import java.util.ArrayList;
 public class ResponderEvent {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponderEvent.class);
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final SimpleAutoResponder responder;
 
@@ -53,6 +58,20 @@ public class ResponderEvent {
                 LOG.error("Could not execute event: {}", e.getMessage());
             }
         }
+    }
+
+    /**
+     * Replies to the event
+     * @param messages The messages you want to send
+     */
+    public void reply(String... messages) {
+        ObjectNode object = objectMapper.createObjectNode();
+
+        ArrayNode replies = object.withArray("replies");
+
+        for (String message : messages) replies.addObject().put("message", message);
+
+        responseController.text(object.toString());
     }
 
     /**
