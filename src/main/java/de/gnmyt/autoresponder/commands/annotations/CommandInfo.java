@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandInfo {
 
-    String[] aliases();
+    String[] triggers();
 
     String[] bannedGroupNames() default {};
 
