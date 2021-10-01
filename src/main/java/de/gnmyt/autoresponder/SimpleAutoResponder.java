@@ -40,7 +40,7 @@ public class SimpleAutoResponder {
     /**
      * Registers the responder context
      */
-    public void registerContext() {
+    private void registerContext() {
         HttpContext context = httpServer.createContext("/", new ResponderContext(this));
 
         if (authenticationDetails != null)
