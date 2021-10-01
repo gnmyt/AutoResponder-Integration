@@ -13,6 +13,19 @@ public class SimpleAutoResponder {
     private int port = 8025;
 
     /**
+     * Starts the auto responder server
+     *
+     * @throws ResponderException Throws whenever the webserver could not start
+     */
+    public void start() throws ResponderException {
+        try {
+            httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+        } catch (IOException e) {
+            throw new ResponderException("Could not open a webserver under the port " + port + ": " + e.getMessage());
+        }
+    }
+
+    /**
      * Gets the port of the webserver
      *
      * @return the port of the webserver
@@ -30,19 +43,6 @@ public class SimpleAutoResponder {
     public SimpleAutoResponder setPort(int port) {
         this.port = port;
         return this;
-    }
-
-    /**
-     * Starts the auto responder server
-     *
-     * @throws ResponderException Throws whenever the webserver could not start
-     */
-    public void start() throws ResponderException {
-        try {
-            httpServer = HttpServer.create(new InetSocketAddress(port), 0);
-        } catch (IOException e) {
-            throw new ResponderException("Could not open a webserver under the port " + port + ": " + e.getMessage());
-        }
     }
 
 }
