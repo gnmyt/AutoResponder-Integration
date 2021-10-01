@@ -2,12 +2,15 @@ package de.gnmyt.autoresponder;
 
 import com.sun.net.httpserver.HttpServer;
 import de.gnmyt.autoresponder.authentication.AuthenticationDetails;
+import de.gnmyt.autoresponder.event.api.EventManager;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class SimpleAutoResponder {
+
+    private final EventManager eventManager = new EventManager();
 
     private HttpServer httpServer;
     private AuthenticationDetails authenticationDetails;
@@ -61,4 +64,12 @@ public class SimpleAutoResponder {
         return this;
     }
 
+    /**
+     * Gets the event manager
+     *
+     * @return the event manager
+     */
+    public EventManager getEventManager() {
+        return eventManager;
+    }
 }
