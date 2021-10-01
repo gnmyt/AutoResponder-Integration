@@ -53,9 +53,10 @@ public class SimpleAutoResponder {
      *
      * @param listeners The listeners that you want to register
      */
-    public void registerListener(Listener... listeners) {
+    public SimpleAutoResponder registerListener(Listener... listeners) {
         for (Listener listener : listeners)
             eventManager.addEventListener(listener);
+        return this;
     }
 
     /**
