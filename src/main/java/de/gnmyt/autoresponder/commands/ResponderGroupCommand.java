@@ -1,4 +1,9 @@
 package de.gnmyt.autoresponder.commands;
 
-public abstract class ResponderGroupCommand {
+import de.gnmyt.autoresponder.entities.ChatCommandData;
+
+public abstract class ResponderGroupCommand extends ResponderCommand {
+
+    public abstract void execute(ChatCommandData command, Arguments args, AnswerController controller);
+
 }
