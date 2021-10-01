@@ -46,7 +46,7 @@ public class EventManager {
      * @param method   The method you want to register
      * @param listener The listener you want to register
      */
-    public void register(Method method, Listener listener) {
+    private void register(Method method, Listener listener) {
         Class<?> clazz = method.getParameterTypes()[0];
         EventData methodData = new EventData(listener, method);
         if (!methodData.method.isAccessible()) methodData.method.setAccessible(true);
