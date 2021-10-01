@@ -14,14 +14,32 @@ public abstract class ResponderCommand {
         // The usage of the command
     }
 
+    /**
+     * Creates a new {@link SimpleUsageBuilder}, which adds a new usage element
+     *
+     * @param type The type of the usage element
+     * @param name The name of the usage element
+     * @return the created {@link SimpleUsageBuilder}
+     */
     public SimpleUsageBuilder addUsage(UsageType type, String name) {
         return new SimpleUsageBuilder(this).type(type).name(name);
     }
 
+    /**
+     * Creates a new {@link SimpleUsageBuilder}, which adds a new usage element
+     *
+     * @param name The name of the usage element
+     * @return the created {@link SimpleUsageBuilder}
+     */
     public SimpleUsageBuilder addUsage(String name) {
         return new SimpleUsageBuilder(this).name(name);
     }
 
+    /**
+     * Adds a new usage element to the list
+     *
+     * @param usageElement The usage element you want to add
+     */
     public void addUsageElement(UsageElement usageElement) {
         usageElements.add(usageElement);
     }
