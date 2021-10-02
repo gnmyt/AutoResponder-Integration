@@ -1,13 +1,15 @@
 package de.gnmyt.autoresponder.entities;
 
-public class GroupCommandData extends CommandData {
+import de.gnmyt.autoresponder.http.controller.HttpResponseController;
+
+public class GroupCommand extends Command {
 
     private final String group;
     private final String message;
     private final String sender;
 
     /**
-     * Constructor of the {@link GroupCommandData}
+     * Constructor of the {@link GroupCommand}
      *
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of the messenger
@@ -16,8 +18,8 @@ public class GroupCommandData extends CommandData {
      * @param message              The message itself
      * @param sender               The sender that sent the message
      */
-    public GroupCommandData(String appPackageName, String messengerPackageName, int ruleId, String group, String message, String sender) {
-        super(appPackageName, messengerPackageName, ruleId);
+    public GroupCommand(HttpResponseController controller, String appPackageName, String messengerPackageName, int ruleId, String group, String message, String sender) {
+        super(controller, appPackageName, messengerPackageName, ruleId);
         this.group = group;
         this.message = message;
         this.sender = sender;
