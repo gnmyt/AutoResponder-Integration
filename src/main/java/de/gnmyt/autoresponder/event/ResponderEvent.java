@@ -15,8 +15,6 @@ public class ResponderEvent {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponderEvent.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final SimpleAutoResponder responder;
 
     private final String appPackageName;
@@ -65,13 +63,7 @@ public class ResponderEvent {
      * @param messages The messages you want to send
      */
     public void reply(String... messages) {
-        ObjectNode object = objectMapper.createObjectNode();
-
-        ArrayNode replies = object.withArray("replies");
-
-        for (String message : messages) replies.addObject().put("message", message);
-
-        responseController.text(object.toString());
+        responseController.reply(messages);
     }
 
     /**

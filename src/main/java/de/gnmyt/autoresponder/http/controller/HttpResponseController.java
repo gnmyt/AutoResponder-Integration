@@ -1,6 +1,9 @@
 package de.gnmyt.autoresponder.http.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.net.httpserver.HttpExchange;
 import de.gnmyt.autoresponder.http.Response;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ public class HttpResponseController {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpResponseController.class);
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Response response = new Response();
     private final HttpExchange exchange;
 
@@ -60,6 +64,21 @@ public class HttpResponseController {
     public void text(String text) {
         writeToOutput(text);
         send();
+    }
+
+    /**
+     * Replies to the response
+     *
+     * @param messages The messages you want to send
+     */
+    public void reply(String... messages) {
+        ObjectNode object = objectMapper.createObjectNode();
+
+        ArrayNode replies = object.withArray("replies");
+
+        for (String message : messages) replies.addObject().put("message", message);
+
+        text(object.toString());
     }
 
     /**
