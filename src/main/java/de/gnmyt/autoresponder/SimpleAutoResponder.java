@@ -123,8 +123,9 @@ public class SimpleAutoResponder {
      *
      * @param prefix The new command prefix
      */
-    public void setPrefix(String prefix) {
+    public SimpleAutoResponder setPrefix(String prefix) {
         this.prefix = prefix;
+        return this;
     }
 
     /**
