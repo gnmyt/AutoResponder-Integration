@@ -18,6 +18,8 @@ public class HttpResponseController {
     private final Response response = new Response();
     private final HttpExchange exchange;
 
+    private boolean responseSent = false;
+
     /**
      * Constructor of the {@link HttpResponseController}
      *
@@ -64,6 +66,10 @@ public class HttpResponseController {
      * Sends the response to the AutoResponder
      */
     public void send() {
+        if (isResponseSent()) {
+            LOG.warn("Reply already sent, ignoring the message.");
+            return;
+        }
         OutputStream os = exchange.getResponseBody();
 
         response
@@ -86,10 +92,19 @@ public class HttpResponseController {
                 exchange.sendResponseHeaders(response.getCode(), bs.length);
                 os.write(bs);
             }
+            responseSent = true;
             os.close();
         } catch (IOException e) {
             LOG.error("Could not process response: " + e.getMessage());
         }
     }
 
+    /**
+     * Checks if the response has already been sent
+     *
+     * @return <code>true</code> if the response has already been sent, otherwise <code>false</code>
+     */
+    public boolean isResponseSent() {
+        return responseSent;
+    }
 }
