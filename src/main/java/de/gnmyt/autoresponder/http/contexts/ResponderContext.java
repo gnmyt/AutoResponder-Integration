@@ -34,11 +34,9 @@ public class ResponderContext extends SimpleHttpHandler {
 
         JsonNode query = rootNode.get("query");
 
-        CompletableFuture.runAsync(() -> {
-            run(rootNode.get("appPackageName").asText(), rootNode.get("messengerPackageName").asText(),
-                    query.get("sender").asText(), query.get("message").asText(), query.get("isGroup").asBoolean(),
-                    query.get("groupParticipant").asText(), query.get("ruleId").asInt(), controller);
-        });
+        CompletableFuture.runAsync(() -> run(rootNode.get("appPackageName").asText(), rootNode.get("messengerPackageName").asText(),
+                query.get("sender").asText(), query.get("message").asText(), query.get("isGroup").asBoolean(),
+                query.get("groupParticipant").asText(), query.get("ruleId").asInt(), controller));
     }
 
     /**
