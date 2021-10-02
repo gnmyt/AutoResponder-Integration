@@ -1,6 +1,10 @@
 package de.gnmyt.autoresponder.entities;
 
-public class CommandData {
+import de.gnmyt.autoresponder.http.controller.HttpResponseController;
+
+public class Command {
+
+    private final HttpResponseController responseController;
 
     private final String appPackageName;
     private final String messengerPackageName;
@@ -8,16 +12,22 @@ public class CommandData {
     private final int ruleId;
 
     /**
-     * Constructor of the {@link CommandData}
+     * Constructor of the {@link Command}
      *
+     * @param responseController   The response controller
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of the messenger
      * @param ruleId               The id of the rule
      */
-    public CommandData(String appPackageName, String messengerPackageName, int ruleId) {
+    public Command(HttpResponseController responseController, String appPackageName, String messengerPackageName, int ruleId) {
+        this.responseController = responseController;
         this.appPackageName = appPackageName;
         this.messengerPackageName = messengerPackageName;
         this.ruleId = ruleId;
+    }
+
+    public void reply(String... messages) {
+        responseController.reply(messages);
     }
 
     /**
