@@ -2,19 +2,26 @@ package de.gnmyt.autoresponder.http.contexts;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 import de.gnmyt.autoresponder.http.handler.SimpleHttpHandler;
 
+import java.util.concurrent.CompletableFuture;
+
 public class ResponderContext extends SimpleHttpHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final SimpleAutoResponder responder;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     /**
      * Constructor of the {@link ResponderContext}
+     *
      * @param responder Your current {@link SimpleAutoResponder} instance
      */
     public ResponderContext(SimpleAutoResponder responder) {
@@ -27,9 +34,13 @@ public class ResponderContext extends SimpleHttpHandler {
 
         JsonNode query = rootNode.get("query");
 
-        triggerEvent(rootNode.get("appPackageName").asText(), rootNode.get("messengerPackageName").asText(),
-                query.get("sender").asText(), query.get("message").asText(), query.get("isGroup").asBoolean(),
-                query.get("groupParticipant").asText(), query.get("ruleId").asInt(), controller);
+        CompletableFuture.runAsync(() -> {
+            triggerEvent(rootNode.get("appPackageName").asText(), rootNode.get("messengerPackageName").asText(),
+                    query.get("sender").asText(), query.get("message").asText(), query.get("isGroup").asBoolean(),
+                    query.get("groupParticipant").asText(), query.get("ruleId").asInt(), controller);
+
+            if (!controller.isResponseSent()) sendNotFoundReply(query, controller);
+        });
     }
 
     /**
@@ -52,5 +63,22 @@ public class ResponderContext extends SimpleHttpHandler {
         } else {
             new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message).call();
         }
+    }
+
+    /**
+     * Sends the "not found"-reply
+     *
+     * @param query      The query that the responder sent
+     * @param controller The response controller from the request
+     */
+    public void sendNotFoundReply(JsonNode query, HttpResponseController controller) {
+        ObjectNode object = objectMapper.createObjectNode();
+        ArrayNode replies = object.withArray("replies");
+
+        responder.getNotFoundHandler().handleRequest(query.get("isGroup").asBoolean() ? query.get("groupParticipant").asText()
+                : query.get("sender").asText(), query.get("message").asText()).forEach(message ->
+                replies.add(mapper.createObjectNode().put("message", message)));
+
+        controller.text(object.toString());
     }
 }
