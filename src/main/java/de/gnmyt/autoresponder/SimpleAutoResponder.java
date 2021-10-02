@@ -5,19 +5,23 @@ import com.sun.net.httpserver.HttpServer;
 import de.gnmyt.autoresponder.authentication.AuthenticationDetails;
 import de.gnmyt.autoresponder.authentication.ResponderAuthentication;
 import de.gnmyt.autoresponder.commands.ResponderCommand;
+import de.gnmyt.autoresponder.commands.annotations.CommandInfo;
 import de.gnmyt.autoresponder.event.api.EventManager;
 import de.gnmyt.autoresponder.event.api.Listener;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
 import de.gnmyt.autoresponder.handler.NotFoundHandler;
 import de.gnmyt.autoresponder.handler.SendNothingHandler;
 import de.gnmyt.autoresponder.http.contexts.ResponderContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SimpleAutoResponder {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleAutoResponder.class);
 
     private final EventManager eventManager = new EventManager();
 
@@ -77,7 +81,13 @@ public class SimpleAutoResponder {
      * @return the current {@link SimpleAutoResponder} instance
      */
     public SimpleAutoResponder registerCommand(ResponderCommand... commands) {
-        this.commands.addAll(Arrays.asList(commands));
+        for (ResponderCommand command : commands) {
+            if (command.getClass().isAnnotationPresent(CommandInfo.class)) {
+                this.commands.add(command);
+            } else {
+                LOG.error("Could not register command {}. You need to add the command information annotation.", command.getClass().getName());
+            }
+        }
         return this;
     }
 
