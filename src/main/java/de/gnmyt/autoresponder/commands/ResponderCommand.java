@@ -44,5 +44,12 @@ public abstract class ResponderCommand {
         usageElements.add(usageElement);
     }
 
-
+    /**
+     * Gets all usage elements
+     *
+     * @return all usage elements
+     */
+    public ArrayList<UsageElement> getUsageElements() {
+        return usageElements;
+    }
 }
