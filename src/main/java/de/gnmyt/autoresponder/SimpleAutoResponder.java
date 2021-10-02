@@ -24,6 +24,7 @@ public class SimpleAutoResponder {
     private NotFoundHandler notFoundHandler = new SendNothingHandler();
 
     private int port = 8025;
+    private String prefix = "/";
 
     /**
      * Starts the auto responder server
@@ -106,6 +107,24 @@ public class SimpleAutoResponder {
     public SimpleAutoResponder setPort(int port) {
         this.port = port;
         return this;
+    }
+
+    /**
+     * Gets the current command prefix
+     *
+     * @return the current command prefix
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /**
+     * Sets the command prefix
+     *
+     * @param prefix The new command prefix
+     */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     /**
