@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import de.gnmyt.autoresponder.authentication.AuthenticationDetails;
 import de.gnmyt.autoresponder.authentication.ResponderAuthentication;
+import de.gnmyt.autoresponder.commands.ResponderCommand;
 import de.gnmyt.autoresponder.event.api.EventManager;
 import de.gnmyt.autoresponder.event.api.Listener;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
@@ -13,6 +14,8 @@ import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SimpleAutoResponder {
 
@@ -22,6 +25,8 @@ public class SimpleAutoResponder {
     private AuthenticationDetails authenticationDetails;
 
     private NotFoundHandler notFoundHandler = new SendNothingHandler();
+
+    private final ArrayList<ResponderCommand> commands = new ArrayList<>();
 
     private int port = 8025;
     private String prefix = "/";
@@ -57,10 +62,22 @@ public class SimpleAutoResponder {
      * Registers the provided listeners
      *
      * @param listeners The listeners that you want to register
+     * @return the current {@link SimpleAutoResponder} instance
      */
     public SimpleAutoResponder registerListener(Listener... listeners) {
         for (Listener listener : listeners)
             eventManager.addEventListener(listener);
+        return this;
+    }
+
+    /**
+     * Registers the provided responder command
+     *
+     * @param commands The commands you want to register
+     * @return the current {@link SimpleAutoResponder} instance
+     */
+    public SimpleAutoResponder registerCommand(ResponderCommand... commands) {
+        this.commands.addAll(Arrays.asList(commands));
         return this;
     }
 
@@ -144,5 +161,14 @@ public class SimpleAutoResponder {
      */
     public NotFoundHandler getNotFoundHandler() {
         return notFoundHandler;
+    }
+
+    /**
+     * Gets all registered commands
+     *
+     * @return all registered commands
+     */
+    public ArrayList<ResponderCommand> getCommands() {
+        return commands;
     }
 }
