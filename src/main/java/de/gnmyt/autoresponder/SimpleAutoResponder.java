@@ -7,6 +7,8 @@ import de.gnmyt.autoresponder.authentication.ResponderAuthentication;
 import de.gnmyt.autoresponder.event.api.EventManager;
 import de.gnmyt.autoresponder.event.api.Listener;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
+import de.gnmyt.autoresponder.handler.NotFoundHandler;
+import de.gnmyt.autoresponder.handler.SendNothingHandler;
 import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 
 import java.io.IOException;
@@ -18,6 +20,8 @@ public class SimpleAutoResponder {
 
     private HttpServer httpServer;
     private AuthenticationDetails authenticationDetails;
+
+    private NotFoundHandler notFoundHandler = new SendNothingHandler();
 
     private int port = 8025;
 
@@ -74,6 +78,17 @@ public class SimpleAutoResponder {
     }
 
     /**
+     * Sets the custom "not found handler". It executes whenever a message could not be found / answered
+     *
+     * @param notFoundHandler The new "not found handler"
+     * @return the current {@link SimpleAutoResponder} instance
+     */
+    public SimpleAutoResponder useNotFoundHandler(NotFoundHandler notFoundHandler) {
+        this.notFoundHandler = notFoundHandler;
+        return this;
+    }
+
+    /**
      * Gets the port of the webserver
      *
      * @return the port of the webserver
@@ -100,5 +115,14 @@ public class SimpleAutoResponder {
      */
     public EventManager getEventManager() {
         return eventManager;
+    }
+
+    /**
+     * Gets the handler which executes whenever the message could not be found
+     *
+     * @return the not found handler
+     */
+    public NotFoundHandler getNotFoundHandler() {
+        return notFoundHandler;
     }
 }
