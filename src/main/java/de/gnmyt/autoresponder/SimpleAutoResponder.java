@@ -83,6 +83,7 @@ public class SimpleAutoResponder {
     public SimpleAutoResponder registerCommand(ResponderCommand... commands) {
         for (ResponderCommand command : commands) {
             if (command.getClass().isAnnotationPresent(CommandInfo.class)) {
+                command.usage();
                 this.commands.add(command);
             } else {
                 LOG.error("Could not register command {}. You need to add the command information annotation.", command.getClass().getName());
