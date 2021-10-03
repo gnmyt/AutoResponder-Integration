@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
+import de.gnmyt.autoresponder.commands.usage.UsageElement;
 import de.gnmyt.autoresponder.commands.usage.UsageException;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
@@ -101,6 +102,33 @@ public class ResponderContext extends SimpleHttpHandler {
         }
 
         return arguments;
+    }
+
+    /**
+     * Gets the clean usage.
+     * <p>
+     * That means that the optimized usage automatically removes the quotation marks from the usage.
+     * It also moves the last provided usage elements to the needed usage element
+     *
+     * @param usageParts    Your current usage
+     * @param usageElements The list of all usage elements needed to run this command
+     * @return the clean usage
+     */
+    public ArrayList<Object> getOptimizedUsage(ArrayList<Object> usageParts, ArrayList<UsageElement> usageElements) {
+
+        for (int i = usageParts.size() - 1; i >= usageElements.size(); i--) {
+            usageParts.set(i - 1, usageParts.get(i - 1) + " " + usageParts.get(i));
+            usageParts.remove(i);
+        }
+
+        for (int i = 0; i < usageParts.size(); i++) {
+            if (usageParts.get(i).toString().startsWith("\""))
+                usageParts.set(i, usageParts.get(i).toString().substring(1));
+            if (usageParts.get(i).toString().endsWith("\""))
+                usageParts.set(i, usageParts.get(i).toString().substring(0, usageParts.get(i).toString().length() - 1));
+        }
+
+        return usageParts;
     }
 
     /**
