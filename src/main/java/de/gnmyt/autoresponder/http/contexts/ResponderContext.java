@@ -71,6 +71,10 @@ public class ResponderContext extends SimpleHttpHandler {
     public void run(String appPackageName, String messengerPackageName, String sender, String message, boolean isGroup,
                     String groupParticipant, int ruleId, HttpResponseController controller) {
 
+        if (message.startsWith(responder.getPrefix()))
+            runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
+                    groupParticipant, ruleId, controller);
+
         triggerEvent(appPackageName, messengerPackageName, sender, message, isGroup, groupParticipant, ruleId, controller);
 
         if (!controller.isResponseSent()) sendNotFoundReply(isGroup ? groupParticipant : sender, message, controller);
