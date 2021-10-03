@@ -1,9 +1,12 @@
 package de.gnmyt.autoresponder.event.group;
 
 import de.gnmyt.autoresponder.SimpleAutoResponder;
+import de.gnmyt.autoresponder.entities.LockedChannel;
 import de.gnmyt.autoresponder.event.ResponderEvent;
 import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
+
+import java.util.function.Consumer;
 
 public class GroupMessageReceivedEvent extends ResponderEvent {
 
@@ -28,6 +31,15 @@ public class GroupMessageReceivedEvent extends ResponderEvent {
         this.group = group;
         this.message = message;
         this.sender = sender;
+    }
+
+    /**
+     * Waits until a new message has been sent
+     *
+     * @param then The action that should be executed after the message has been sent
+     */
+    public void awaitAnswer(Consumer<GroupMessageReceivedEvent> then) {
+        getResponderContext().LOCKED_CHANNELS.add(new LockedChannel(getGroup(), true, getSender(), then));
     }
 
     /**
