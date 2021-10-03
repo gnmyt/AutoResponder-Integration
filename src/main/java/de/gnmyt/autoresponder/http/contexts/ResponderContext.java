@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
+import de.gnmyt.autoresponder.commands.usage.UsageException;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
@@ -79,6 +80,22 @@ public class ResponderContext extends SimpleHttpHandler {
         } else {
             new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message).call();
         }
+    }
+
+    /**
+     * Sends the usage error reply
+     *
+     * @param exception  Your usage exception created from the command
+     * @param controller The instance of the {@link HttpResponseController} to reply to the message
+     */
+    public void sendUsageErrorReply(UsageException exception, HttpResponseController controller) {
+        ObjectNode object = objectMapper.createObjectNode();
+        ArrayNode replies = object.withArray("replies");
+
+        responder.getUsageHandler().handleUsageException(exception).forEach(currentMessage ->
+                replies.add(mapper.createObjectNode().put("message", currentMessage)));
+
+        controller.text(object.toString());
     }
 
     /**
