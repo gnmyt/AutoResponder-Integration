@@ -105,7 +105,7 @@ public class ResponderContext extends SimpleHttpHandler {
 
             if (lockedChannel.isGroup()) {
                 if (lockedChannel.getGroupName().equals(((GroupMessageReceivedEvent) event).getGroup())
-                        && lockedChannel.getGroupName().equals(((GroupMessageReceivedEvent) event).getSender())) {
+                        && lockedChannel.getSender().equals(((GroupMessageReceivedEvent) event).getSender())) {
                     ((Consumer<GroupMessageReceivedEvent>) lockedChannel.getConsumer()).accept(((GroupMessageReceivedEvent) event));
                     LOCKED_CHANNELS.remove(i);
                     return true;
