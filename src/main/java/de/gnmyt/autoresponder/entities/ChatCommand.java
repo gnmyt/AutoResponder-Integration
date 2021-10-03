@@ -1,9 +1,7 @@
 package de.gnmyt.autoresponder.entities;
 
-import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
+import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
-
-import java.util.function.Consumer;
 
 public class ChatCommand extends Command {
 
@@ -13,20 +11,18 @@ public class ChatCommand extends Command {
     /**
      * Constructor of the {@link ChatCommand}
      *
+     * @param controller           The response controller
+     * @param context              The responder context
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of the messenger
      * @param ruleId               The id of the rule
      * @param sender               The sender of the message
      * @param message              The message itself
      */
-    public ChatCommand(HttpResponseController controller, String appPackageName, String messengerPackageName, int ruleId, String sender, String message) {
-        super(controller, appPackageName, messengerPackageName, ruleId);
+    public ChatCommand(HttpResponseController controller, ResponderContext context, String appPackageName, String messengerPackageName, int ruleId, String sender, String message) {
+        super(controller, context, appPackageName, messengerPackageName, ruleId);
         this.sender = sender;
         this.message = message;
-    }
-
-    public void awaitAnswer(Consumer<ChatMessageReceivedEvent> then) {
-        then.accept(new ChatMessageReceivedEvent(null, null, null, 1, null, null, null));
     }
 
     /**
