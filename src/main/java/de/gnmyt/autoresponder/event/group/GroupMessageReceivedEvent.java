@@ -2,6 +2,7 @@ package de.gnmyt.autoresponder.event.group;
 
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.event.ResponderEvent;
+import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 
 public class GroupMessageReceivedEvent extends ResponderEvent {
@@ -12,6 +13,7 @@ public class GroupMessageReceivedEvent extends ResponderEvent {
 
     /**
      * @param responder            The current instance of your {@link SimpleAutoResponder}
+     * @param context              The context of the request
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of your whatsapp instance
      * @param ruleId               The id of the rule that has been executed
@@ -20,9 +22,9 @@ public class GroupMessageReceivedEvent extends ResponderEvent {
      * @param message              The message itself
      * @param sender               The sender which sent the message
      */
-    public GroupMessageReceivedEvent(SimpleAutoResponder responder, String appPackageName, String messengerPackageName, int ruleId,
+    public GroupMessageReceivedEvent(SimpleAutoResponder responder, ResponderContext context, String appPackageName, String messengerPackageName, int ruleId,
                                      HttpResponseController responseController, String group, String message, String sender) {
-        super(responder, appPackageName, messengerPackageName, ruleId, responseController);
+        super(responder, context, appPackageName, messengerPackageName, ruleId, responseController);
         this.group = group;
         this.message = message;
         this.sender = sender;

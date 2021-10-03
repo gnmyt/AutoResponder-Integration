@@ -2,6 +2,7 @@ package de.gnmyt.autoresponder.event;
 
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.event.api.EventData;
+import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ public class ResponderEvent {
     private final String appPackageName;
     private final String messengerPackageName;
 
+    private final ResponderContext responderContext;
     private final HttpResponseController responseController;
 
     private final int ruleId;
@@ -25,13 +27,15 @@ public class ResponderEvent {
      * Constructor of the {@link ResponderEvent}
      *
      * @param responder            The current instance of your {@link SimpleAutoResponder}
+     * @param responderContext
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of your whatsapp instance
      * @param ruleId               The id of the rule that has been executed
      * @param responseController   The response controller of the executed request
      */
-    public ResponderEvent(SimpleAutoResponder responder, String appPackageName, String messengerPackageName, int ruleId, HttpResponseController responseController) {
+    public ResponderEvent(SimpleAutoResponder responder, ResponderContext responderContext, String appPackageName, String messengerPackageName, int ruleId, HttpResponseController responseController) {
         this.responder = responder;
+        this.responderContext = responderContext;
         this.appPackageName = appPackageName;
         this.messengerPackageName = messengerPackageName;
         this.ruleId = ruleId;
@@ -80,6 +84,15 @@ public class ResponderEvent {
      */
     public String getMessengerPackageName() {
         return messengerPackageName;
+    }
+
+    /**
+     * Gets the responder context
+     *
+     * @return the responder context
+     */
+    protected ResponderContext getResponderContext() {
+        return responderContext;
     }
 
     /**

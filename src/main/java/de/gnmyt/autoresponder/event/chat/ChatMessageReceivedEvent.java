@@ -2,6 +2,7 @@ package de.gnmyt.autoresponder.event.chat;
 
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.event.ResponderEvent;
+import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 
 public class ChatMessageReceivedEvent extends ResponderEvent {
@@ -13,6 +14,7 @@ public class ChatMessageReceivedEvent extends ResponderEvent {
      * Constructor of the {@link ChatMessageReceivedEvent}
      *
      * @param responder            The current instance of your {@link SimpleAutoResponder}
+     * @param context              The context of the request
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of your whatsapp instance
      * @param ruleId               The id of the rule that has been executed
@@ -20,9 +22,9 @@ public class ChatMessageReceivedEvent extends ResponderEvent {
      * @param sender               The sender which sent the message
      * @param message              The message itself
      */
-    public ChatMessageReceivedEvent(SimpleAutoResponder responder, String appPackageName, String messengerPackageName, int ruleId,
+    public ChatMessageReceivedEvent(SimpleAutoResponder responder, ResponderContext context, String appPackageName, String messengerPackageName, int ruleId,
                                     HttpResponseController responseController, String sender, String message) {
-        super(responder, appPackageName, messengerPackageName, ruleId, responseController);
+        super(responder, context, appPackageName, messengerPackageName, ruleId, responseController);
         this.sender = sender;
         this.message = message;
     }
