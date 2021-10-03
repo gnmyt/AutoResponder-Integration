@@ -140,10 +140,10 @@ public class ResponderContext extends SimpleHttpHandler {
         ResponderEvent event;
 
         if (isGroup) {
-            event = new GroupMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender,
+            event = new GroupMessageReceivedEvent(responder, this, appPackageName, messengerPackageName, ruleId, controller, sender,
                     message, groupParticipant);
         } else {
-            event = new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message);
+            event = new ChatMessageReceivedEvent(responder, this, appPackageName, messengerPackageName, ruleId, controller, sender, message);
         }
 
         return event;
