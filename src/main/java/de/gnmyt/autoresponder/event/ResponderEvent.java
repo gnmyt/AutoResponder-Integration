@@ -1,8 +1,5 @@
 package de.gnmyt.autoresponder.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.event.api.EventData;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
@@ -60,6 +57,7 @@ public class ResponderEvent {
 
     /**
      * Replies to the event
+     *
      * @param messages The messages you want to send
      */
     public void reply(String... messages) {
