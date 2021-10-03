@@ -1,10 +1,12 @@
 package de.gnmyt.autoresponder.entities;
 
+import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 
 public class Command {
 
     private final HttpResponseController responseController;
+    private final ResponderContext responderContext;
 
     private final String appPackageName;
     private final String messengerPackageName;
@@ -15,12 +17,14 @@ public class Command {
      * Constructor of the {@link Command}
      *
      * @param responseController   The response controller
+     * @param responderContext     The responder context
      * @param appPackageName       The package name of the responder app
      * @param messengerPackageName The package name of the messenger
      * @param ruleId               The id of the rule
      */
-    public Command(HttpResponseController responseController, String appPackageName, String messengerPackageName, int ruleId) {
+    public Command(HttpResponseController responseController, ResponderContext responderContext, String appPackageName, String messengerPackageName, int ruleId) {
         this.responseController = responseController;
+        this.responderContext = responderContext;
         this.appPackageName = appPackageName;
         this.messengerPackageName = messengerPackageName;
         this.ruleId = ruleId;
@@ -46,6 +50,15 @@ public class Command {
      */
     public String getMessengerPackageName() {
         return messengerPackageName;
+    }
+
+    /**
+     * Gets the responder context
+     *
+     * @return the responder context
+     */
+    protected ResponderContext getResponderContext() {
+        return responderContext;
     }
 
     /**
