@@ -22,4 +22,8 @@ public class Arguments {
         return (boolean) arguments.get(name);
     }
 
+    public boolean exists(String name) {
+        return arguments.containsKey(name);
+    }
+
 }
