@@ -1,9 +1,12 @@
 package de.gnmyt.autoresponder.event.chat;
 
 import de.gnmyt.autoresponder.SimpleAutoResponder;
+import de.gnmyt.autoresponder.entities.LockedChannel;
 import de.gnmyt.autoresponder.event.ResponderEvent;
 import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
+
+import java.util.function.Consumer;
 
 public class ChatMessageReceivedEvent extends ResponderEvent {
 
@@ -27,6 +30,15 @@ public class ChatMessageReceivedEvent extends ResponderEvent {
         super(responder, context, appPackageName, messengerPackageName, ruleId, responseController);
         this.sender = sender;
         this.message = message;
+    }
+
+    /**
+     * Waits until a new message has been sent
+     *
+     * @param then The action that should be executed after the message has been sent
+     */
+    public void awaitAnswer(Consumer<ChatMessageReceivedEvent> then) {
+        getResponderContext().LOCKED_CHANNELS.add(new LockedChannel(null, false, getSender(), then));
     }
 
     /**
