@@ -15,6 +15,7 @@ import de.gnmyt.autoresponder.commands.usage.UsageException;
 import de.gnmyt.autoresponder.commands.usage.UsageType;
 import de.gnmyt.autoresponder.entities.ChatCommand;
 import de.gnmyt.autoresponder.entities.GroupCommand;
+import de.gnmyt.autoresponder.entities.LockedChannel;
 import de.gnmyt.autoresponder.event.ResponderEvent;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
@@ -25,12 +26,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.gnmyt.autoresponder.commands.usage.UsageExceptionType.*;
 
 public class ResponderContext extends SimpleHttpHandler {
+
+    public final ArrayList<LockedChannel> LOCKED_CHANNELS = new ArrayList<>();
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final SimpleAutoResponder responder;
@@ -74,6 +78,8 @@ public class ResponderContext extends SimpleHttpHandler {
 
         ResponderEvent event = getEvent(appPackageName, messengerPackageName, sender, message, isGroup, groupParticipant, ruleId, controller);
 
+        if (executeUnlockAction(event)) return;
+
         if (message.startsWith(responder.getPrefix())
                 && runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
                 groupParticipant, ruleId, controller)) return;
@@ -82,6 +88,40 @@ public class ResponderContext extends SimpleHttpHandler {
 
         if (!controller.isResponseSent()) sendNotFoundReply(isGroup ? groupParticipant : sender, message, controller);
     }
+
+    /**
+     * Executes the unlock action
+     *
+     * @param event The event given by the request
+     * @return <code>true</code> if the channel was locked, otherwise false
+     */
+    public boolean executeUnlockAction(ResponderEvent event) {
+        for (int i = 0; i < LOCKED_CHANNELS.size(); i++) {
+            LockedChannel lockedChannel = LOCKED_CHANNELS.get(i);
+
+            if (!((lockedChannel.isGroup() && event instanceof GroupMessageReceivedEvent)
+                    || (!lockedChannel.isGroup() && event instanceof ChatMessageReceivedEvent)))
+                continue;
+
+            if (lockedChannel.isGroup()) {
+                if (lockedChannel.getGroupName().equals(((GroupMessageReceivedEvent) event).getGroup())
+                        && lockedChannel.getGroupName().equals(((GroupMessageReceivedEvent) event).getSender())) {
+                    ((Consumer<GroupMessageReceivedEvent>) lockedChannel.getConsumer()).accept(((GroupMessageReceivedEvent) event));
+                    LOCKED_CHANNELS.remove(i);
+                    return true;
+                }
+            } else {
+                if (lockedChannel.getSender().equals(((ChatMessageReceivedEvent) event).getSender())) {
+                    ((Consumer<ChatMessageReceivedEvent>) lockedChannel.getConsumer()).accept((ChatMessageReceivedEvent) event);
+                    LOCKED_CHANNELS.remove(i);
+                    return true;
+                }
+            }
+
+        }
+        return false;
+    }
+
 
     /**
      * Triggers the correct event
