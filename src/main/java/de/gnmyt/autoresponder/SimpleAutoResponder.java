@@ -6,6 +6,8 @@ import de.gnmyt.autoresponder.authentication.AuthenticationDetails;
 import de.gnmyt.autoresponder.authentication.ResponderAuthentication;
 import de.gnmyt.autoresponder.commands.ResponderCommand;
 import de.gnmyt.autoresponder.commands.annotations.CommandInfo;
+import de.gnmyt.autoresponder.commands.usage.handler.SimpleUsageErrorHandler;
+import de.gnmyt.autoresponder.commands.usage.handler.UsageHandler;
 import de.gnmyt.autoresponder.event.api.EventManager;
 import de.gnmyt.autoresponder.event.api.Listener;
 import de.gnmyt.autoresponder.exceptions.ResponderException;
@@ -29,11 +31,13 @@ public class SimpleAutoResponder {
     private AuthenticationDetails authenticationDetails;
 
     private NotFoundHandler notFoundHandler = new SendNothingHandler();
+    private UsageHandler usageHandler = new SimpleUsageErrorHandler();
 
     private final ArrayList<ResponderCommand> commands = new ArrayList<>();
 
     private int port = 8025;
     private String prefix = "/";
+
 
     /**
      * Starts the auto responder server
@@ -118,6 +122,19 @@ public class SimpleAutoResponder {
     }
 
     /**
+     * Sets the command usage handler of the {@link SimpleAutoResponder}.
+     * <p>
+     * It executes whenever the usage could not be processed
+     *
+     * @param usageHandler The new "command usage handler"
+     * @return the current {@link SimpleAutoResponder} instance
+     */
+    public SimpleAutoResponder useCommandUsageHandler(UsageHandler usageHandler) {
+        this.usageHandler = usageHandler;
+        return this;
+    }
+
+    /**
      * Gets the port of the webserver
      *
      * @return the port of the webserver
@@ -172,6 +189,15 @@ public class SimpleAutoResponder {
      */
     public NotFoundHandler getNotFoundHandler() {
         return notFoundHandler;
+    }
+
+    /**
+     * Gets the command usage handler which executes whenever the usage could not be processed
+     *
+     * @return the command usage handler
+     */
+    public UsageHandler getUsageHandler() {
+        return usageHandler;
     }
 
     /**
