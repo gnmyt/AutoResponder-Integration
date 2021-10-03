@@ -3,25 +3,28 @@ package de.gnmyt.autoresponder.commands.usage;
 public class UsageElement {
 
     private String name;
-    private int length;
-    private boolean required;
-    private UsageType type;
+    private int minLength = -1;
+    private int maxLength = -1;
+    private boolean required = true;
+    private UsageType type = UsageType.STRING;
     private String description;
-    private Object[] allowedValues;
+    private Object[] allowedValues = new Object[0];
 
     /**
      * The full constructor with all prefilled values
      *
      * @param name          The name of the usage element
-     * @param length        The length of the usage element
+     * @param minLength     The min length of the usage element
+     * @param maxLength     The max length of the usage element
      * @param required      <code>true</code> if the usage element is required, otherwise <code>false</code>
      * @param type          The type of the usage element
      * @param description   The description of the usage element
      * @param allowedValues All allowed values of the usage element
      */
-    public UsageElement(String name, int length, boolean required, UsageType type, String description, Object[] allowedValues) {
+    public UsageElement(String name, int minLength, int maxLength, boolean required, UsageType type, String description, Object[] allowedValues) {
         this.name = name;
-        this.length = length;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
         this.required = required;
         this.type = type;
         this.description = description;
@@ -54,21 +57,37 @@ public class UsageElement {
     }
 
     /**
-     * Gets the length of the usage element
+     * Gets the minimal length of the usage element
      *
-     * @return the length of the usage element
+     * @return the minimal length of the usage element
      */
-    public int getLength() {
-        return length;
+    public int getMinLength() {
+        return minLength;
     }
 
     /**
-     * Sets the length of the usage element
+     * Sets the minimal length of the usage element
      *
-     * @param length The new length of the usage element
+     * @param minLength The new minimal length of the usage element
      */
-    public void setLength(int length) {
-        this.length = length;
+    public void setMinLength(int minLength) {
+        this.minLength = minLength;
+    }
+
+    /**
+     * Gets the maximal length of the usage element
+     * @return the maximal length of the usage element
+     */
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    /**
+     * Sets the maximal length of the usage element
+     * @param maxLength The new maximal length of the usage element
+     */
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
     }
 
     /**

@@ -29,13 +29,24 @@ public class SimpleUsageBuilder {
     }
 
     /**
-     * Sets the length of the usage element
+     * Sets the maximal length of the usage element
      *
-     * @param length The new length of the usage element
+     * @param length The new maximal length of the usage element
      * @return the current {@link SimpleUsageBuilder} instance
      */
-    public SimpleUsageBuilder length(int length) {
-        usageElement.setLength(length);
+    public SimpleUsageBuilder maxLength(int length) {
+        usageElement.setMaxLength(length);
+        return this;
+    }
+
+    /**
+     * Sets the minimal length of the usage element
+     *
+     * @param length The new minimal length of the usage element
+     * @return the current {@link SimpleUsageBuilder} instance
+     */
+    public SimpleUsageBuilder minLength(int length) {
+        usageElement.setMinLength(length);
         return this;
     }
 
