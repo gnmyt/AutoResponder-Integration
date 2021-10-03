@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
+import de.gnmyt.autoresponder.commands.Arguments;
 import de.gnmyt.autoresponder.commands.ResponderCommand;
 import de.gnmyt.autoresponder.commands.usage.UsageElement;
 import de.gnmyt.autoresponder.commands.usage.UsageException;
@@ -16,6 +17,7 @@ import de.gnmyt.autoresponder.http.handler.SimpleHttpHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,6 +91,37 @@ public class ResponderContext extends SimpleHttpHandler {
         } else {
             new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message).call();
         }
+    }
+
+    /**
+     * Handles the usage of a command
+     *
+     * @param command        The command you want to check
+     * @param foundTrigger   The command trigger
+     * @param commandMessage The command message
+     * @param controller     The {@link HttpResponseController} to reply to possible errors
+     * @return the arguments of the usage
+     */
+    public Arguments handleUsage(ResponderCommand command, String foundTrigger, String commandMessage, HttpResponseController controller) {
+        ArrayList<Object> providedUsage;
+        HashMap<String, Object> arguments = new HashMap<>();
+        if (command.getRequiredElements().size() > 0) {
+            try {
+                if (commandMessage.length() <= foundTrigger.length() + 1)
+                    throw new UsageException(USAGE_NOT_COMPLETE, "The provided usage is not complete", null);
+
+                providedUsage = validateUsage(command, commandMessage.substring(foundTrigger.length() + 1));
+            } catch (UsageException e) {
+                sendUsageErrorReply(e, controller);
+                return null;
+            }
+
+            for (int i = 0; i < command.getUsageElements().size(); i++) {
+                arguments.put(command.getUsageElements().get(i).getName(), providedUsage.get(i));
+            }
+        }
+
+        return new Arguments(arguments);
     }
 
     /**
