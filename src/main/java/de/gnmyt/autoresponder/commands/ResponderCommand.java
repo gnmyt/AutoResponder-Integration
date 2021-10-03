@@ -52,4 +52,16 @@ public abstract class ResponderCommand {
     public ArrayList<UsageElement> getUsageElements() {
         return usageElements;
     }
+
+    /**
+     * Gets all required elements
+     *
+     * @return all required elements
+     */
+    public ArrayList<UsageElement> getRequiredElements() {
+        ArrayList<UsageElement> requiredUsageElements = new ArrayList<>();
+        for (UsageElement usageElement : usageElements)
+            if (usageElement.isRequired()) requiredUsageElements.add(usageElement);
+        return requiredUsageElements;
+    }
 }
