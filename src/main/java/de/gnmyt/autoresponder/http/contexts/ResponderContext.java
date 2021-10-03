@@ -15,6 +15,7 @@ import de.gnmyt.autoresponder.commands.usage.UsageException;
 import de.gnmyt.autoresponder.commands.usage.UsageType;
 import de.gnmyt.autoresponder.entities.ChatCommand;
 import de.gnmyt.autoresponder.entities.GroupCommand;
+import de.gnmyt.autoresponder.event.ResponderEvent;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
@@ -71,11 +72,13 @@ public class ResponderContext extends SimpleHttpHandler {
     public void run(String appPackageName, String messengerPackageName, String sender, String message, boolean isGroup,
                     String groupParticipant, int ruleId, HttpResponseController controller) {
 
+        ResponderEvent event = getEvent(appPackageName, messengerPackageName, sender, message, isGroup, groupParticipant, ruleId, controller);
+
         if (message.startsWith(responder.getPrefix()))
             runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
                     groupParticipant, ruleId, controller);
 
-        triggerEvent(appPackageName, messengerPackageName, sender, message, isGroup, groupParticipant, ruleId, controller);
+        triggerEvent(event);
 
         if (!controller.isResponseSent()) sendNotFoundReply(isGroup ? groupParticipant : sender, message, controller);
     }
@@ -92,14 +95,27 @@ public class ResponderContext extends SimpleHttpHandler {
      * @param ruleId               The id of the rule that has been executed
      * @param controller           The response controller of the executed request
      */
-    public void triggerEvent(String appPackageName, String messengerPackageName, String sender, String message, boolean isGroup,
-                             String groupParticipant, int ruleId, HttpResponseController controller) {
+    public ResponderEvent getEvent(String appPackageName, String messengerPackageName, String sender, String message, boolean isGroup,
+                                   String groupParticipant, int ruleId, HttpResponseController controller) {
+        ResponderEvent event;
+
         if (isGroup) {
-            new GroupMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender,
-                    message, groupParticipant).call();
+            event = new GroupMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender,
+                    message, groupParticipant);
         } else {
-            new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message).call();
+            event = new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message);
         }
+
+        return event;
+    }
+
+    /**
+     * Triggers the provided event
+     *
+     * @param event The event you want to trigger
+     */
+    public void triggerEvent(ResponderEvent event) {
+        event.call();
     }
 
     /**
@@ -134,11 +150,11 @@ public class ResponderContext extends SimpleHttpHandler {
 
             if (command instanceof ResponderGroupCommand) {
                 ((ResponderGroupCommand) command)
-                        .execute(new GroupCommand(controller, appPackageName, messengerPackageName, ruleId, sender, commandMessage,
+                        .execute(new GroupCommand(controller, this, appPackageName, messengerPackageName, ruleId, sender, commandMessage,
                                 groupParticipant), arguments);
             } else if (command instanceof ResponderChatCommand) {
                 ((ResponderChatCommand) command)
-                        .execute(new ChatCommand(controller, appPackageName, messengerPackageName, ruleId, sender, commandMessage), arguments);
+                        .execute(new ChatCommand(controller, this, appPackageName, messengerPackageName, ruleId, sender, commandMessage), arguments);
             }
         }
     }
