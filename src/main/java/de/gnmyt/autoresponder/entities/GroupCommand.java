@@ -1,6 +1,6 @@
 package de.gnmyt.autoresponder.entities;
 
-import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
+import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.contexts.ResponderContext;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 
@@ -36,7 +36,7 @@ public class GroupCommand extends Command {
      *
      * @param then The action that should be executed after the message has been sent
      */
-    public void awaitAnswer(Consumer<ChatMessageReceivedEvent> then) {
+    public void awaitAnswer(Consumer<GroupMessageReceivedEvent> then) {
         getResponderContext().LOCKED_CHANNELS.add(new LockedChannel(getGroup(), true, getSender(), then));
     }
 
