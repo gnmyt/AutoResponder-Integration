@@ -74,9 +74,9 @@ public class ResponderContext extends SimpleHttpHandler {
 
         ResponderEvent event = getEvent(appPackageName, messengerPackageName, sender, message, isGroup, groupParticipant, ruleId, controller);
 
-        if (message.startsWith(responder.getPrefix()))
-            runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
-                    groupParticipant, ruleId, controller);
+        if (message.startsWith(responder.getPrefix())
+                && runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
+                groupParticipant, ruleId, controller)) return;
 
         triggerEvent(event);
 
@@ -129,9 +129,10 @@ public class ResponderContext extends SimpleHttpHandler {
      * @param groupParticipant     (Optional) The group participant
      * @param ruleId               The id of the rule that has been executed
      * @param controller           The response controller of the executed request
+     * @return <code>true</code> if the command was executed, otherwise <code>false</code>
      */
-    public void runCommand(String appPackageName, String messengerPackageName, String sender, String commandMessage, boolean isGroup,
-                           String groupParticipant, int ruleId, HttpResponseController controller) {
+    public boolean runCommand(String appPackageName, String messengerPackageName, String sender, String commandMessage, boolean isGroup,
+                              String groupParticipant, int ruleId, HttpResponseController controller) {
         for (ResponderCommand command : responder.getCommands()) {
             CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
 
@@ -146,17 +147,20 @@ public class ResponderContext extends SimpleHttpHandler {
 
             Arguments arguments = handleUsage(command, foundTrigger, commandMessage, controller);
 
-            if (arguments == null) return;
+            if (arguments == null) return true;
 
             if (command instanceof ResponderGroupCommand) {
                 ((ResponderGroupCommand) command)
                         .execute(new GroupCommand(controller, this, appPackageName, messengerPackageName, ruleId, sender, commandMessage,
                                 groupParticipant), arguments);
+                return true;
             } else if (command instanceof ResponderChatCommand) {
                 ((ResponderChatCommand) command)
                         .execute(new ChatCommand(controller, this, appPackageName, messengerPackageName, ruleId, sender, commandMessage), arguments);
+                return true;
             }
         }
+        return false;
     }
 
     /**
