@@ -11,7 +11,10 @@ import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 import de.gnmyt.autoresponder.http.handler.SimpleHttpHandler;
 
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ResponderContext extends SimpleHttpHandler {
 
@@ -80,6 +83,24 @@ public class ResponderContext extends SimpleHttpHandler {
         } else {
             new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message).call();
         }
+    }
+
+    /**
+     * Gets the full message in parts (splits with spaces and quotation marks)
+     *
+     * @param input The message input
+     * @return the full message in parts
+     */
+    public ArrayList<Object> getUsageParts(String input) {
+        Matcher argumentMatcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(input);
+
+        ArrayList<Object> arguments = new ArrayList<>();
+
+        while (argumentMatcher.find()) {
+            arguments.add(argumentMatcher.group(1));
+        }
+
+        return arguments;
     }
 
     /**
