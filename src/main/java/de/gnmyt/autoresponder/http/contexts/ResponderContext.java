@@ -6,10 +6,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
 import de.gnmyt.autoresponder.commands.Arguments;
+import de.gnmyt.autoresponder.commands.ResponderChatCommand;
 import de.gnmyt.autoresponder.commands.ResponderCommand;
+import de.gnmyt.autoresponder.commands.ResponderGroupCommand;
+import de.gnmyt.autoresponder.commands.annotations.CommandInfo;
 import de.gnmyt.autoresponder.commands.usage.UsageElement;
 import de.gnmyt.autoresponder.commands.usage.UsageException;
 import de.gnmyt.autoresponder.commands.usage.UsageType;
+import de.gnmyt.autoresponder.entities.ChatCommand;
+import de.gnmyt.autoresponder.entities.GroupCommand;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
@@ -90,6 +95,47 @@ public class ResponderContext extends SimpleHttpHandler {
                     message, groupParticipant).call();
         } else {
             new ChatMessageReceivedEvent(responder, appPackageName, messengerPackageName, ruleId, controller, sender, message).call();
+        }
+    }
+
+    /**
+     * Runs the command
+     *
+     * @param appPackageName       The package name of the responder app
+     * @param messengerPackageName The package name of your whatsapp instance
+     * @param sender               The sender of the message
+     * @param commandMessage       The message without the prefix
+     * @param isGroup              <code>true</code> if the provided message has been sent in a group, otherwise <code>false</code>
+     * @param groupParticipant     (Optional) The group participant
+     * @param ruleId               The id of the rule that has been executed
+     * @param controller           The response controller of the executed request
+     */
+    public void runCommand(String appPackageName, String messengerPackageName, String sender, String commandMessage, boolean isGroup,
+                           String groupParticipant, int ruleId, HttpResponseController controller) {
+        for (ResponderCommand command : responder.getCommands()) {
+            CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
+
+            if ((command instanceof ResponderGroupCommand) && !isGroup || !(command instanceof ResponderGroupCommand) && isGroup)
+                continue;
+
+            String foundTrigger = null;
+            for (String currentTrigger : info.triggers())
+                if (commandMessage.split(" ")[0].equalsIgnoreCase(currentTrigger)) foundTrigger = currentTrigger;
+
+            if (foundTrigger == null) continue;
+
+            Arguments arguments = handleUsage(command, foundTrigger, commandMessage, controller);
+
+            if (arguments == null) return;
+
+            if (command instanceof ResponderGroupCommand) {
+                ((ResponderGroupCommand) command)
+                        .execute(new GroupCommand(controller, appPackageName, messengerPackageName, ruleId, sender, commandMessage,
+                                groupParticipant), arguments);
+            } else if (command instanceof ResponderChatCommand) {
+                ((ResponderChatCommand) command)
+                        .execute(new ChatCommand(controller, appPackageName, messengerPackageName, ruleId, sender, commandMessage), arguments);
+            }
         }
     }
 
