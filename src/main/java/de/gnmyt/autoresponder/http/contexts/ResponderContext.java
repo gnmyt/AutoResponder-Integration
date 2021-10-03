@@ -5,17 +5,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gnmyt.autoresponder.SimpleAutoResponder;
+import de.gnmyt.autoresponder.commands.ResponderCommand;
 import de.gnmyt.autoresponder.commands.usage.UsageElement;
 import de.gnmyt.autoresponder.commands.usage.UsageException;
+import de.gnmyt.autoresponder.commands.usage.UsageType;
 import de.gnmyt.autoresponder.event.chat.ChatMessageReceivedEvent;
 import de.gnmyt.autoresponder.event.group.GroupMessageReceivedEvent;
 import de.gnmyt.autoresponder.http.controller.HttpResponseController;
 import de.gnmyt.autoresponder.http.handler.SimpleHttpHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static de.gnmyt.autoresponder.commands.usage.UsageExceptionType.*;
 
 public class ResponderContext extends SimpleHttpHandler {
 
@@ -129,6 +134,56 @@ public class ResponderContext extends SimpleHttpHandler {
         }
 
         return usageParts;
+    }
+
+    /**
+     * Validates the usage of a command & returns the optimized elements
+     *
+     * @param command The command that has been requested
+     * @param usage   The usage that has been given to the command
+     * @return the created usage
+     * @throws UsageException Throws whenever there was an error in the usage
+     */
+    public ArrayList<Object> validateUsage(ResponderCommand command, String usage) throws UsageException {
+        ArrayList<Object> usageParts = getUsageParts(usage);
+
+        if (command.getRequiredElements().size() > usageParts.size())
+            throw new UsageException(USAGE_NOT_COMPLETE, "The provided usage is not complete", null);
+
+        ArrayList<Object> createdUsage = getOptimizedUsage(usageParts, command.getUsageElements());
+
+        for (int i = 0; i < command.getUsageElements().size(); i++) {
+            UsageElement usageElement = command.getUsageElements().get(i);
+            if (createdUsage.size() <= i) continue;
+
+            Object object = createdUsage.get(i);
+
+            if (usageElement.getMinLength() != -1 && object.toString().length() < usageElement.getMinLength())
+                throw new UsageException(BELOW_MIN_LENGTH, String.format("The length of the element %s should have %s chars",
+                        usageElement.getName(), usageElement.getMinLength()), usageElement.getName());
+
+            if (usageElement.getMaxLength() != -1 && object.toString().length() > usageElement.getMaxLength())
+                throw new UsageException(MAX_LENGTH_EXCEEDED, String.format("The element %s should not have more than %s chars",
+                        usageElement.getName(), usageElement.getMaxLength()), usageElement.getName());
+
+            if (usageElement.getAllowedValues().length > 0)
+                if (!Arrays.asList(usageElement.getAllowedValues()).contains(object))
+                    throw new UsageException(NOT_IN_ALLOWED_VALUES, String.format("The element %s is not allowed to contain %s",
+                            usageElement.getName(), object), usageElement.getName());
+
+            try {
+                if (usageElement.getType() == UsageType.INTEGER) {
+                    createdUsage.set(i, Integer.parseInt(object.toString()));
+                } else if (usageElement.getType() == UsageType.BOOLEAN && object.equals("true") || object.equals("false")) {
+                    throw new Exception("Could not parse the integer value");
+                }
+            } catch (Exception e) {
+                throw new UsageException(USAGE_TYPE_MISMATCH, String.format("The usage element %s must have the type %s", usageElement.getName(),
+                        usageElement.getType()), usageElement.getName());
+            }
+        }
+
+        return createdUsage;
     }
 
     /**
