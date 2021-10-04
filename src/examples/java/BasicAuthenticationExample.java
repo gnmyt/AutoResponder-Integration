@@ -8,6 +8,9 @@ public class BasicAuthenticationExample {
         // Create an instance of the SimpleAutoResponder
         SimpleAutoResponder autoResponder = new SimpleAutoResponder();
 
+        // If you want to, you can also set the port of the webserver (default: 8025)
+        autoResponder.setPort(8031);
+
         // Set your username & password
         autoResponder.useAuthentication("username", "password");
 
