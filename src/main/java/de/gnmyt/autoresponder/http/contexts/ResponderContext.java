@@ -80,9 +80,14 @@ public class ResponderContext extends SimpleHttpHandler {
 
         if (executeUnlockAction(event)) return;
 
-        if (message.startsWith(responder.getPrefix())
-                && runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
-                groupParticipant, ruleId, controller)) return;
+        try {
+            if (message.startsWith(responder.getPrefix())
+                    && runCommand(appPackageName, messengerPackageName, sender, message.substring(responder.getPrefix().length()), isGroup,
+                    groupParticipant, ruleId, controller)) return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         triggerEvent(event);
 
@@ -226,7 +231,7 @@ public class ResponderContext extends SimpleHttpHandler {
                 return null;
             }
 
-            for (int i = 0; i < command.getUsageElements().size(); i++) {
+            for (int i = 0; i < providedUsage.size(); i++) {
                 arguments.put(command.getUsageElements().get(i).getName(), providedUsage.get(i));
             }
         }
@@ -317,8 +322,14 @@ public class ResponderContext extends SimpleHttpHandler {
             try {
                 if (usageElement.getType() == UsageType.INTEGER) {
                     createdUsage.set(i, Integer.parseInt(object.toString()));
-                } else if (usageElement.getType() == UsageType.BOOLEAN && object.equals("true") || object.equals("false")) {
-                    throw new Exception("Could not parse the integer value");
+                } else if (usageElement.getType() == UsageType.BOOLEAN) {
+                    object = object.equals("yes") ? "true" : object;
+                    object = object.equals("no") ? "false" : object;
+
+                    if (object.equals("true") || object.equals("false")) {
+                        createdUsage.set(i, Boolean.parseBoolean(object.toString()));
+                    } else
+                        throw new Exception("Could not parse the boolean value");
                 }
             } catch (Exception e) {
                 throw new UsageException(USAGE_TYPE_MISMATCH, String.format("The usage element %s must have the type %s", usageElement.getName(),
