@@ -18,6 +18,10 @@
 
 An unofficial java integration for the AutoResponder App. Use it to create a more professional and complex bot
 
+
+## Setup guide
+If you want to set this up in the AutoResponder app, you need to follow our [setup guide](SETUP.md)
+
 ### Installation
 
 1. Add the jitpack repository to your `pom.xml`
@@ -43,7 +47,7 @@ An unofficial java integration for the AutoResponder App. Use it to create a mor
 #### 1. Creating a new auto responder instance
 
 ```java
-SimpleAutoResponder autoResponder=new SimpleAutoResponder();
+SimpleAutoResponder autoResponder = new SimpleAutoResponder();
 ```
 
 #### 2. Setting up the responder
@@ -91,8 +95,8 @@ DialogflowIntegration class.
 
    ```java
    DialogflowIntegration integration=new DialogflowIntegration(new File("your_credentials_file.json"));
-        integration.setLanguageCode("de"); // Here you can set the language of the integration
-        integration.getMessage("My message","The sender of the message / a session id for better training");
+   integration.setLanguageCode("de"); // Here you can set the language of the integration
+   integration.getMessage("My message","The sender of the message / a session id for better training");
    ```
 
 #### 5. Listeners
@@ -106,6 +110,10 @@ learn more, check out the [ListenerExample](src/examples/java/ListenerExample.ja
 This project also supports commands. That means that you create your own custom commands that happen after the responder
 sent us the command. You can use the `ResponderGroupCommand` or the `ResponderChatCommand` to handle those commands. If
 you want to learn more, check out the [CommandExample](src/examples/java/CommandExample.java)
+
+#### 7. Secondary use
+You use the AutoResponder app as main place of your rules, any you only want to react to all commands? No problem. Just
+create a new rule and set your command prefix before the "*". The responder will thn only react if the message is a command  
 
 ## Other examples
 
